@@ -10,7 +10,7 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "7.2.*",
+        "php": "7.3.*",
         "botman/botman": "~2.0",
         "botman/driver-telegram": "^1.5",
         "botman/driver-web": "~1.0",
@@ -21,6 +21,7 @@
         "laravel/tinker": "^1.0"
     },
     "require-dev": {
+        "php": "7.2.*",
         "beyondcode/laravel-dump-server": "^1.0",
         "filp/whoops": "~2.0",
         "fzaninotto/faker": "~1.4",
