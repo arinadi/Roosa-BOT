@@ -20,9 +20,14 @@ class MenuConversation extends Conversation
         $this->user = $bot->getUser();
         error_log(var_export($this->user, 1));
     }
-    public function askMenu()
+    public function askMenu($is_back = false)
     {
-        $question = Question::create("Hallo {$this->user->getFirstName()}, Ada yang bisa saya bantu?")
+        $menu = "";
+        if ($is_back) {
+            $menu .= "Hallo {$this->user->getFirstName()}, ";
+        }
+        $menu .= "Ada yang bisa saya bantu?";
+        $question = Question::create($menu)
             ->fallback('Menu tidak tersedia.')
             ->callbackId('ask_menu')
             ->addButtons([
@@ -39,6 +44,7 @@ class MenuConversation extends Conversation
                         $this->say("Id : {$this->user->getId()}");
                         $this->say("Username : {$this->user->getUsername()}");
                         $this->say("Nama : {$this->user->getFirstName()} {$this->user->getLastName()} ");
+                        $this->askBackToMenu();
                         break;
                     case "read_qr":
                         $this->askQr();
@@ -46,9 +52,11 @@ class MenuConversation extends Conversation
                     case "joke":
                         $joke = json_decode(file_get_contents('http://api.icndb.com/jokes/random'));
                         $this->say($joke->value->joke);
+                        $this->askBackToMenu();
                         break;
                     case "quote":
                         $this->say(Inspiring::quote());
+                        $this->askBackToMenu();
                         break;
                 }
             }
@@ -84,6 +92,7 @@ class MenuConversation extends Conversation
 
             if ($err) {
                 $this->say("Baca QR gagal_");
+                $this->askBackToMenu();
             } else {
                 $scan = json_decode($response, true);;
                 error_log(var_export($scan, 1));
@@ -91,11 +100,33 @@ class MenuConversation extends Conversation
                 $scan_result = $scan[0]["symbol"][0]["data"];
                 error_log(var_export($scan_result, 1));
                 if (!is_null($scan_result)) {
-                    $this->say("QR data :");
-                    $this->say($scan_result);
+                    $this->say("QR data :<br> {$scan_result}");
+                    $this->askBackToMenu();
                 } else {
                     $this->say("Baca QR gagal.");
+                    $this->askBackToMenu();
                     // $this->askMenu();
+                }
+            }
+        });
+    }
+
+    public function askBackToMenu()
+    {
+        $question = Question::create("")
+            ->fallback('Tidak tersedia.')
+            ->callbackId('ask_back_to_menu')
+            ->addButtons([
+                Button::create('Menu')->value('go_to_menu'),
+                Button::create('Selesai/Stop')->value('stop'),
+            ]);
+
+        return $this->ask($question, function (Answer $answer) {
+            if ($answer->isInteractiveMessageReply()) {
+                switch ($answer->getValue()) {
+                    case "go_to_menu":
+                        $this->askMenu();
+                        break;
                 }
             }
         });
