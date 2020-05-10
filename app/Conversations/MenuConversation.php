@@ -70,6 +70,7 @@ class MenuConversation extends Conversation
         ]]);
 
         $scan = json_decode($response->getBody(), true);;
+        error_log(var_export($scan, 1));
 
         $scan_result = $scan[0]["symbol"][0]["data"];
         error_log(var_export($scan_result, 1));
