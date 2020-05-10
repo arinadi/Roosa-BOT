@@ -64,7 +64,12 @@ class MenuConversation extends Conversation
         $url = $images[0]->getUrl();
         error_log($url);
         
-        $scan = json_decode(file_get_contents('http://api.qrserver.com/v1/read-qr-code/?fileurl='.urlencode($url)));
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('GET', "http://api.qrserver.com/v1/read-qr-code/", ['query' => [
+            'fileurl' => urlencode($url),
+        ]]);
+
+        $scan = json_decode($response->getBody(), true);;
 
         $scan_result = $scan[0]["symbol"][0]["data"];
         error_log(var_export($scan_result, 1));
@@ -73,7 +78,7 @@ class MenuConversation extends Conversation
             $this->say($scan_result);
         } else {
             $this->say("Baca QR gagal.");
-            $this->askMenu();
+            // $this->askMenu();
         }
         $this->say($scan->value->joke);
     });
