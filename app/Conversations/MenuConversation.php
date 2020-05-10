@@ -57,7 +57,7 @@ class MenuConversation extends Conversation
 
     public function askQr()
 {
-    $this->askForImages('Please upload QR image.', function ($images) {
+    $this->askForImages('Silahkan upload gambar QR code.', function ($images) {
         
         error_log(var_export($images[0], 1));
         
@@ -66,8 +66,16 @@ class MenuConversation extends Conversation
         
         $scan = json_decode(file_get_contents('http://api.qrserver.com/v1/read-qr-code/?fileurl='.urlencode($url)));
 
-        error_log(var_export($scan, 1));
-        // $this->say($scan->value->joke);
+        $scan_result = $scan[0]["symbol"][0]["data"];
+        error_log(var_export($scan_result, 1));
+        if(!is_null($scan_result)){
+            $this->say("QR data :");
+            $this->say($scan_result);
+        } else {
+            $this->say("Baca QR gagal.");
+            $this->askMenu();
+        }
+        $this->say($scan->value->joke);
     });
 }
 
