@@ -23,7 +23,7 @@ class MenuConversation extends Conversation
     public function askMenu($is_back = false)
     {
         $menu = "";
-        if ($is_back) {
+        if (!$is_back) {
             $menu .= "Hallo {$this->user->getFirstName()}, ";
         }
         $menu .= "Ada yang bisa saya bantu?";
@@ -100,7 +100,8 @@ class MenuConversation extends Conversation
                 $scan_result = $scan[0]["symbol"][0]["data"];
                 error_log(var_export($scan_result, 1));
                 if (!is_null($scan_result)) {
-                    $this->say("QR data :<br> {$scan_result}");
+                    $this->say("QR data :");
+                    $this->say("{$scan_result}");
                     $this->askBackToMenu();
                 } else {
                     $this->say("Baca QR gagal.");
@@ -113,11 +114,11 @@ class MenuConversation extends Conversation
 
     public function askBackToMenu()
     {
-        $question = Question::create("")
+        $question = Question::create("Proses selesai, Selanjutnya?")
             ->fallback('Tidak tersedia.')
             ->callbackId('ask_back_to_menu')
             ->addButtons([
-                Button::create('Menu')->value('go_to_menu'),
+                Button::create('Kembali ke-Menu')->value('go_to_menu'),
                 Button::create('Selesai/Stop')->value('stop'),
             ]);
 
@@ -125,7 +126,7 @@ class MenuConversation extends Conversation
             if ($answer->isInteractiveMessageReply()) {
                 switch ($answer->getValue()) {
                     case "go_to_menu":
-                        $this->askMenu();
+                        $this->askMenu(true);
                         break;
                 }
             }

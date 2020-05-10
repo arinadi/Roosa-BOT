@@ -9,6 +9,6 @@ $botman->hears('Hi', function ($bot) {
 $botman->hears('shap', BotManController::class.'@startConversation');
 
 $botman->hears('menu', BotManController::class.'@menuConversation');
-$botman->hears('stop', function(BotMan $bot) {
-	// $bot->reply('');
+$botman->hears('stop', function($bot) {
+	$bot->reply('Terimakasih');
 })->stopsConversation();
