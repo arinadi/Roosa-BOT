@@ -63,9 +63,9 @@ class MenuConversation extends Conversation
         
         $url = $images[0]->getUrl();
         error_log($url);
-        
+        $this->say("Ok, Sedang membaca QR...");
         $client = new \GuzzleHttp\Client();
-        $response = $client->request('GET', "http://api.qrserver.com/v1/read-qr-code/", ['query' => [
+        $response = $client->request('GET', "https://api.qrserver.com/v1/read-qr-code/", ['query' => [
             'fileurl' => urlencode($url),
         ]]);
 
@@ -80,7 +80,6 @@ class MenuConversation extends Conversation
             $this->say("Baca QR gagal.");
             // $this->askMenu();
         }
-        $this->say($scan->value->joke);
     });
 }
 
