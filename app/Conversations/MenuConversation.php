@@ -18,8 +18,10 @@ class MenuConversation extends Conversation
     {
         // Access user
         $this->user = $bot->getUser();
+        $this->driver = $bot->getDriver();
         // error_log(var_export($this->user, 1));
-        error_log(json_encode($bot->getMessage()->getPayload()));
+        // error_log(json_encode($bot->getMessage()->getPayload()));
+        error_log(json_encode($bot->getDriver()));
     }
     public function askMenu($is_back = false)
     {
@@ -73,44 +75,69 @@ class MenuConversation extends Conversation
             $url = $images[0]->getUrl();
             error_log($url);
             $this->say("Ok, Sedang membaca QR...");
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.qrserver.com/v1/read-qr-code/?fileurl=" . urlencode($url),
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_TIMEOUT => 30000,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "GET",
-                CURLOPT_HTTPHEADER => array(
-                    // Set Here Your Requesred Headers
-                    'Content-Type: application/json',
-                ),
-            ));
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
-            curl_close($curl);
-
-            if ($err) {
-                $this->say("Baca QR gagal_");
-                $this->askBackToMenu();
+            if ($this->driver == "Telegram") {
+                $this->qrScan($url);
             } else {
-                $scan = json_decode($response, true);;
-                error_log(var_export($scan, 1));
-
-                $scan_result = $scan[0]["symbol"][0]["data"];
-                error_log(var_export($scan_result, 1));
-                if (!is_null($scan_result)) {
-                    $this->say("QR data :");
-                    $this->say("{$scan_result}");
-                    $this->askBackToMenu();
-                } else {
-                    $this->say("Baca QR gagal.");
-                    $this->askBackToMenu();
-                    // $this->askMenu();
-                }
+                $this->qrScanThirdParty($url);
             }
         });
+    }
+
+    private function qrScan($url)
+    {
+        $qrcode = new QrReader($url);
+        $scan_result = $qrcode->text(); //return decoded text from QR Code
+        if (!is_null($scan_result)) {
+            $this->say("QR data :");
+            $this->say("{$scan_result}");
+            $this->askBackToMenu();
+        } else {
+            $this->say("Baca QR gagal.");
+            $this->askBackToMenu();
+            // $this->askMenu();
+        }
+    }
+
+    private function qrScanThirdParty($url)
+    {
+        //make sure there are no credentials on URL send to Third Party
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.qrserver.com/v1/read-qr-code/?fileurl=" . urlencode($url),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_TIMEOUT => 30000,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                // Set Here Your Requesred Headers
+                'Content-Type: application/json',
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+
+        if ($err) {
+            $this->say("Baca QR gagal_");
+            $this->askBackToMenu();
+        } else {
+            $scan = json_decode($response, true);;
+            error_log(var_export($scan, 1));
+
+            $scan_result = $scan[0]["symbol"][0]["data"];
+            error_log(var_export($scan_result, 1));
+            if (!is_null($scan_result)) {
+                $this->say("QR data :");
+                $this->say("{$scan_result}");
+                $this->askBackToMenu();
+            } else {
+                $this->say("Baca QR gagal.");
+                $this->askBackToMenu();
+                // $this->askMenu();
+            }
+        }
     }
 
     public function askBackToMenu()
