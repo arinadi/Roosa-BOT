@@ -32,6 +32,9 @@ class MenuConversation extends Conversation
             case 9:
                 $driver = "telegram";
                 break;
+            case 13:
+                $driver = "web";
+                break;
             default:
                 # code...
                 break;
@@ -91,7 +94,7 @@ class MenuConversation extends Conversation
             $url = $images[0]->getUrl();
             error_log($url);
             $this->say("Ok, Sedang membaca QR...");
-            if ($this->driver == "telegram") {
+            if (in_array($this->driver, ["telegram", "web"])) {
                 $this->qrScan($url);
             } else {
                 $this->qrScanThirdParty($url);
