@@ -9,6 +9,8 @@ use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\BotMan;
 
+use Illuminate\Support\Facades\Storage;
+
 class MenuConversation extends Conversation
 {
     /**
@@ -22,10 +24,11 @@ class MenuConversation extends Conversation
 
         // error_log(var_export($this->user, 1));
         // error_log(json_encode($bot->getMessage()->getPayload()));
-        error_log("Driver : ".$this->driver);
+        error_log("Driver : " . $this->driver);
     }
 
-    private function getDriverById($id){
+    private function getDriverById($id)
+    {
         $length = strlen($id);
         $driver = null;
         switch ($length) {
@@ -104,17 +107,18 @@ class MenuConversation extends Conversation
 
     private function qrScan($url)
     {
-        $qrcode = new QrReader($url);
-        $scan_result = $qrcode->text(); //return decoded text from QR Code
-        if (!is_null($scan_result)) {
-            $this->say("QR data :");
-            $this->say("{$scan_result}");
-            $this->askBackToMenu();
-        } else {
-            $this->say("Baca QR gagal.");
-            $this->askBackToMenu();
-            // $this->askMenu();
-        }
+        //Get File
+        $contents = file_get_contents($url);
+        $name = $this->user->getId().substr($url, strrpos($url, '/') + 1);
+        Storage::put($name, $contents, 'public');
+
+        //Get Local url
+        $url = asset($name);
+        error_log($url);
+        //Start Scan
+        $this->qrScanThirdParty($url);
+        //delete image
+        Storage::delete($name);
     }
 
     private function qrScanThirdParty($url)
