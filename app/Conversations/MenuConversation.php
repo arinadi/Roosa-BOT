@@ -18,7 +18,8 @@ class MenuConversation extends Conversation
     {
         // Access user
         $this->user = $bot->getUser();
-        error_log(var_export($this->user, 1));
+        // error_log(var_export($this->user, 1));
+        error_log(var_export($bot->getMessage()->getPayload(), 1));
     }
     public function askMenu($is_back = false)
     {
