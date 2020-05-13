@@ -18,11 +18,27 @@ class MenuConversation extends Conversation
     {
         // Access user
         $this->user = $bot->getUser();
-        $this->driver = $bot->getDriver();
+        $this->driver = $this->getDriverById($this->user->getId());
+
         // error_log(var_export($this->user, 1));
         // error_log(json_encode($bot->getMessage()->getPayload()));
-        error_log("Driver : ".json_encode($bot->getDriver()));
+        error_log("Driver : ".$this->driver);
     }
+
+    private function getDriverById($id){
+        $length = strlen($id);
+        $driver = null;
+        switch ($length) {
+            case 9:
+                $driver = "telegram";
+                break;
+            default:
+                # code...
+                break;
+        }
+        return $driver;
+    }
+
     public function askMenu($is_back = false)
     {
         $menu = "";
@@ -75,7 +91,7 @@ class MenuConversation extends Conversation
             $url = $images[0]->getUrl();
             error_log($url);
             $this->say("Ok, Sedang membaca QR...");
-            if ($this->driver == "Telegram") {
+            if ($this->driver == "telegram") {
                 $this->qrScan($url);
             } else {
                 $this->qrScanThirdParty($url);
