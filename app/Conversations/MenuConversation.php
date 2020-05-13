@@ -118,7 +118,7 @@ class MenuConversation extends Conversation
         //Start Scan
         $this->qrScanThirdParty($url);
         //delete image
-        Storage::delete($name);
+        // Storage::delete($name);
     }
 
     private function qrScanThirdParty($url)
