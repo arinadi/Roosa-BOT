@@ -21,7 +21,7 @@ class MenuConversation extends Conversation
         $this->driver = $bot->getDriver();
         // error_log(var_export($this->user, 1));
         // error_log(json_encode($bot->getMessage()->getPayload()));
-        error_log(json_encode($bot->getDriver()));
+        error_log("Driver : ".json_encode($bot->getDriver()));
     }
     public function askMenu($is_back = false)
     {
