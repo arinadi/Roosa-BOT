@@ -32,10 +32,10 @@ class MenuConversation extends Conversation
             ->fallback('Menu tidak tersedia.')
             ->callbackId('ask_menu')
             ->addButtons([
-                Button::create('Detail Saya')->value('my_detail'),
-                Button::create('Baca QR Code')->value('read_qr'),
-                Button::create('Tell a joke')->value('joke'),
-                Button::create('Give me a fancy quote')->value('quote'),
+                Button::create('📂 Detail Saya')->value('my_detail'),
+                Button::create('📷 Baca QR Code')->value('read_qr'),
+                Button::create('😆 Tell a joke')->value('joke'),
+                Button::create('😇 Give me a fancy quote')->value('quote'),
             ]);
 
         return $this->ask($question, function (Answer $answer) {
