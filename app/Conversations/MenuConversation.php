@@ -113,6 +113,10 @@ class MenuConversation extends Conversation
         $path = "public/".$name;
         $upload = Storage::put($path, $contents, 'public');
         error_log($upload);
+
+        $files = Storage::allFiles();
+        error_log(json_encode($files));
+        
         //Get Local url
         $url = asset("storage/".$name);
         error_log($url);
