@@ -110,15 +110,16 @@ class MenuConversation extends Conversation
         //Get File
         $contents = file_get_contents($url);
         $name = $this->user->getId().substr($url, strrpos($url, '/') + 1);
-        Storage::put($name, $contents, 'public');
+        $path = "public/".$name;
+        Storage::put($path, $contents, 'public');
 
         //Get Local url
-        $url = asset($name);
+        $url = asset("storage/".$name);
         error_log($url);
         //Start Scan
         $this->qrScanThirdParty($url);
         //delete image
-        // Storage::delete($name);
+        // Storage::delete($path);
     }
 
     private function qrScanThirdParty($url)
