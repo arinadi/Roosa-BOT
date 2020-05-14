@@ -111,8 +111,8 @@ class MenuConversation extends Conversation
         $contents = file_get_contents($url);
         $name = $this->user->getId().substr($url, strrpos($url, '/') + 1);
         $path = "public/".$name;
-        Storage::put($path, $contents, 'public');
-
+        $upload = Storage::put($path, $contents, 'public');
+        error_log($upload);
         //Get Local url
         $url = asset("storage/".$name);
         error_log($url);
