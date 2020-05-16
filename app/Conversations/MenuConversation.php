@@ -9,7 +9,7 @@ use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\BotMan;
 
-use Storage;
+use Illuminate\Support\Facades\Storage;
 
 class MenuConversation extends Conversation
 {
@@ -92,10 +92,10 @@ class MenuConversation extends Conversation
     {
         $this->askForImages('Silahkan upload gambar QR code.', function ($images) {
 
-            error_log(var_export($images[0], 1));
+            // error_log(var_export($images[0], 1));
 
             $url = $images[0]->getUrl();
-            error_log($url);
+            // error_log($url);
             $this->say("Ok, Sedang membaca QR...");
             if (in_array($this->driver, ["telegram", "web"])) {
                 $this->qrScan($url);
@@ -108,13 +108,7 @@ class MenuConversation extends Conversation
     private function qrScan($url)
     {
         //Get File
-        $name = $this->user->getId().substr($url, strrpos($url, '/') + 1);
-        // $ext = pathinfo($name, PATHINFO_EXTENSION);
-        // error_log($ext);
-        // if(empty($ext)){
-        //     $name = $name.".jpg";
-        //     error_log("new name : ".$name);
-        // }
+        $name = $this->user->getId().'.jpg';
         
         $content = file_get_contents($url);
         $path = "public/temp/qrcode";
@@ -148,11 +142,12 @@ class MenuConversation extends Conversation
             $height = $img->height();
             error_log("RESIZE : {$width}x{$height}");
         }
+        $img->encode('jpg', 5);
 
         try {
             error_log('START UPLOAD : ');
             $dropbox =  Storage::disk('dropbox')->getDriver()->getAdapter()->getClient();
-            Storage::disk('dropbox')->put("{$path}/{$name}", $img->__toString());
+            Storage::disk('dropbox')->put("{$path}/{$name}", (string) $img);
             $dropbox->createSharedLinkWithSettings("{$path}/{$name}");
 
             $link = $dropbox->listSharedLinks("{$path}/{$name}");
@@ -171,11 +166,11 @@ class MenuConversation extends Conversation
             $this->askBackToMenu();
         }
 
-        // try {
-        //     Storage::disk('dropbox')->delete("{$path}/{$name}");
-        // } catch (\Exception $e) {
-        //     error_log("Error : ". $e->getMessage());
-        // }
+        try {
+            Storage::disk('dropbox')->delete("{$path}/{$name}");
+        } catch (\Exception $e) {
+            error_log("Error : ". $e->getMessage());
+        }
     }
 
     private function qrScanThirdParty($url)
