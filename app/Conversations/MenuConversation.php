@@ -144,8 +144,9 @@ class MenuConversation extends Conversation
             $img->resize($w, $h, function ($constraint) {
                 $constraint->aspectRatio();
             });
-            error_log('RESIZE : ');
-            // exit();
+            $width = $img->width();
+            $height = $img->height();
+            error_log("RESIZE : {$width}x{$height}");
         }
 
         try {
