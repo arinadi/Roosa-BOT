@@ -109,19 +109,49 @@ class MenuConversation extends Conversation
     {
         //Get File
         $name = $this->user->getId().substr($url, strrpos($url, '/') + 1);
-        $ext = pathinfo($name, PATHINFO_EXTENSION);
-        error_log($ext);
-        if(empty($ext)){
-            $name = $name.".jpg";
-            error_log("new name : ".$name);
-        }
+        // $ext = pathinfo($name, PATHINFO_EXTENSION);
+        // error_log($ext);
+        // if(empty($ext)){
+        //     $name = $name.".jpg";
+        //     error_log("new name : ".$name);
+        // }
         
-        $contents = file_get_contents($url);
+        $content = file_get_contents($url);
         $path = "public/temp/qrcode";
 
+        $img = \Image::make($content);
+        $width = $img->width();
+        $height = $img->height();
+        error_log("size : {$width}x{$height}");
+        $need_resize = false;
+
+        if($width > $height && $width > 720){
+            $w = 720;
+            $h = null;
+            $need_resize = true;
+            error_log('need_resize : ');
+        }
+
+        if($height > $width && $height > 720){
+            $h = 720;
+            $w = null;
+            $need_resize = true;
+            error_log('need_resize : ');
+        }
+
+
+        if($need_resize == true){
+            $img->resize($w, $h, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+            error_log('RESIZE : ');
+            // exit();
+        }
+
         try {
+            error_log('START UPLOAD : ');
             $dropbox =  Storage::disk('dropbox')->getDriver()->getAdapter()->getClient();
-            Storage::disk('dropbox')->put("{$path}/{$name}", $contents);
+            Storage::disk('dropbox')->put("{$path}/{$name}", $img->__toString());
             $dropbox->createSharedLinkWithSettings("{$path}/{$name}");
 
             $link = $dropbox->listSharedLinks("{$path}/{$name}");
@@ -141,7 +171,7 @@ class MenuConversation extends Conversation
         }
 
         // try {
-        //     Storage::disk('dropbox')->delete("{$path}/{$name}", $contents);
+        //     Storage::disk('dropbox')->delete("{$path}/{$name}");
         // } catch (\Exception $e) {
         //     error_log("Error : ". $e->getMessage());
         // }
