@@ -140,11 +140,11 @@ class MenuConversation extends Conversation
             $this->askBackToMenu();
         }
 
-        try {
-            Storage::disk('dropbox')->delete("{$path}/{$name}", $contents);
-        } catch (\Exception $e) {
-            error_log("Error : ". $e->getMessage());
-        }
+        // try {
+        //     Storage::disk('dropbox')->delete("{$path}/{$name}", $contents);
+        // } catch (\Exception $e) {
+        //     error_log("Error : ". $e->getMessage());
+        // }
     }
 
     private function qrScanThirdParty($url)
