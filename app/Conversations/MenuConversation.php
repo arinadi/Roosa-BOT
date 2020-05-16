@@ -135,11 +135,16 @@ class MenuConversation extends Conversation
 
             $this->qrScanThirdParty($url);
         } catch (\Exception $e) {
-            error_log("Upload Error : ". $e->getMessage());
+            error_log("Error : ". $e->getMessage());
             $this->say("Baca QR gagal.");
             $this->askBackToMenu();
         }
-        Storage::disk('dropbox')->delete("{$path}/{$name}", $contents);
+
+        try {
+            Storage::disk('dropbox')->delete("{$path}/{$name}", $contents);
+        } catch (\Exception $e) {
+            error_log("Error : ". $e->getMessage());
+        }
     }
 
     private function qrScanThirdParty($url)
