@@ -9,7 +9,7 @@ use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\BotMan;
 
-use Illuminate\Support\Facades\Storage;
+use Storage;
 
 class MenuConversation extends Conversation
 {
@@ -108,22 +108,39 @@ class MenuConversation extends Conversation
     private function qrScan($url)
     {
         //Get File
-        $contents = file_get_contents($url);
         $name = $this->user->getId().substr($url, strrpos($url, '/') + 1);
-        $path = "public/".$name;
-        $upload = Storage::put($path, $contents, 'public');
-        error_log($upload);
-
-        $files = Storage::allFiles();
-        error_log(json_encode($files));
+        $ext = pathinfo($name, PATHINFO_EXTENSION);
+        error_log($ext);
+        if(empty($ext)){
+            $name = $name.".jpg";
+            error_log("new name : ".$name);
+        }
         
-        //Get Local url
-        $url = asset("storage/".$name);
-        error_log($url);
-        //Start Scan
-        $this->qrScanThirdParty($url);
-        //delete image
-        // Storage::delete($path);
+        $contents = file_get_contents($url);
+        $path = "public/temp/qrcode";
+
+        try {
+            $dropbox =  Storage::disk('dropbox')->getDriver()->getAdapter()->getClient();
+            Storage::disk('dropbox')->put("{$path}/{$name}", $contents);
+            $dropbox->createSharedLinkWithSettings("{$path}/{$name}");
+
+            $link = $dropbox->listSharedLinks("{$path}/{$name}");
+            error_log(json_encode($link));
+
+            $raw = explode("?", $link[0]['url']);
+            error_log(json_encode($raw));
+            
+            $url = $raw[0]. '?raw=1';
+            error_log($url);
+
+            $this->qrScanThirdParty($url);
+
+            Storage::disk('dropbox')->delete("{$path}/{$name}", $contents);
+        } catch (\Exception $e) {
+            error_log("Upload Error : ". $e->getMessage());
+            $this->say("Baca QR gagal.");
+            $this->askBackToMenu();
+        }
     }
 
     private function qrScanThirdParty($url)
