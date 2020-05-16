@@ -142,7 +142,7 @@ class MenuConversation extends Conversation
             $height = $img->height();
             error_log("RESIZE : {$width}x{$height}");
         }
-        $img->encode('jpg', 10);
+        $img->encode('jpg', 50);
 
         try {
             error_log('START UPLOAD : ');
