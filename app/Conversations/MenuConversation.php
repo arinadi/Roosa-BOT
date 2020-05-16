@@ -134,13 +134,12 @@ class MenuConversation extends Conversation
             error_log($url);
 
             $this->qrScanThirdParty($url);
-
-            Storage::disk('dropbox')->delete("{$path}/{$name}", $contents);
         } catch (\Exception $e) {
             error_log("Upload Error : ". $e->getMessage());
             $this->say("Baca QR gagal.");
             $this->askBackToMenu();
         }
+        Storage::disk('dropbox')->delete("{$path}/{$name}", $contents);
     }
 
     private function qrScanThirdParty($url)
@@ -183,6 +182,8 @@ class MenuConversation extends Conversation
                 // $this->askMenu();
             }
         }
+
+        // return ['status' => 'finished'];
     }
 
     public function askBackToMenu()
