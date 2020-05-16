@@ -142,7 +142,7 @@ class MenuConversation extends Conversation
             $height = $img->height();
             error_log("RESIZE : {$width}x{$height}");
         }
-        $img->encode('jpg', 5);
+        $img->encode('jpg', 10);
 
         try {
             error_log('START UPLOAD : ');
@@ -166,11 +166,11 @@ class MenuConversation extends Conversation
             $this->askBackToMenu();
         }
 
-        try {
-            Storage::disk('dropbox')->delete("{$path}/{$name}");
-        } catch (\Exception $e) {
-            error_log("Error : ". $e->getMessage());
-        }
+        // try {
+        //     Storage::disk('dropbox')->delete("{$path}/{$name}");
+        // } catch (\Exception $e) {
+        //     error_log("Error : ". $e->getMessage());
+        // }
     }
 
     private function qrScanThirdParty($url)
